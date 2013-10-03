@@ -7,12 +7,6 @@ typedef struct __UARTStruct UARTStruct;
 typedef struct __WebStruct WebStruct;
 typedef struct __ControlStruct ControlStruct;
 
-
-
-#define LOWBITS 0xFF
-#define HIGHBITS 0xFF00
-
-
 /* MAPPING STUFF */
 
 struct __MappingStruct{

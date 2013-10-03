@@ -12,6 +12,8 @@
 #include "control.h"
 #include "semphr.h"
 #include "vtUtilities.h"
+
+
 #define INSPECT_STACK 1
 #define baseStack 2
 #if PRINTF_VERSION == 1
@@ -62,7 +64,7 @@ static portTASK_FUNCTION(UARTTask, pvParameters)
 
 			case sensorDataMsg:
 		 	{
-				short sensorData = (256 * msgBuffer.buf[0]) + msgBuffer.buf[1];
+				short sensorData = (short)(256 * msgBuffer.buf[0]) + msgBuffer.buf[1];
 				
 
 				break;
@@ -73,7 +75,7 @@ static portTASK_FUNCTION(UARTTask, pvParameters)
 			/* == Here, the motor control message sent from the control task is 
 			 * received by the UART task and ready to send
 			 */
-			   	short motorMsg = (256 * msgBuffer.buf[0]) + msgBuffer.buf[1];
+			   	short motorMsg = (short)(256 * msgBuffer.buf[0]) + msgBuffer.buf[1];
 				break;
 			}
 			default:

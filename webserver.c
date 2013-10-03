@@ -159,7 +159,7 @@ portBASE_TYPE sendWSFromControlMsg(WebStruct * webData, unsigned char webCommand
 	if(webData == NULL) VT_HANDLE_FATAL_ERROR(0);
    	
 	WebMsg buffer;
-	buffer.length = 64;
+	buffer.length = 256;
 	if(buffer.length > WebMaxLength)VT_HANDLE_FATAL_ERROR(0);
 
 	int i = 0;
@@ -189,7 +189,7 @@ portBASE_TYPE sendWSFromMappingMsg(WebStruct * webData, unsigned char webCommand
 	if(webData == NULL) VT_HANDLE_FATAL_ERROR(0);
    	
 	WebMsg buffer;
-	buffer.length = 64;
+	buffer.length = 256;
 	if(buffer.length > WebMaxLength)VT_HANDLE_FATAL_ERROR(0);
 
 	int i = 0;

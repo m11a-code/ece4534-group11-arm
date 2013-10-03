@@ -68,13 +68,13 @@ static portTASK_FUNCTION( MappingTask, pvParameters )
 			
 			case vertexDataMsg:
 			{  	
-				short vertexData = (256 * msgBuffer.buf[0]) + msgBuffer.buf[1];
+				short vertexData = (unsigned short)(256 * msgBuffer.buf[0]) + msgBuffer.buf[1];
 			
 				break;
 			}
 			case sideLengthMsg:
 			{
-				short sideLengthData = (256 * msgBuffer.buf[0]) + msgBuffer.buf[1];
+				short sideLengthData = (unsigned short)(256 * msgBuffer.buf[0]) + msgBuffer.buf[1];
 
 			 	break;
 			}
@@ -95,6 +95,9 @@ portBASE_TYPE sendVertexDataMsg(MappingStruct * mappingData, unsigned short vert
 	buffer.length = 2;
 	if(buffer.length > MappingMaxLength)VT_HANDLE_FATAL_ERROR(0);
 
+
+
+	//buf[0] is the top 8 bytes, buf[1] is the bottom 8 bytes
 	buffer.buf[1] = vertexData & 0xFF;
 	buffer.buf[0] = (vertexData >> 8)	& 0xFF;
 	buffer.msgType = vertexDataMsg;
@@ -110,11 +113,11 @@ portBASE_TYPE sendSideLengthDataMsg(MappingStruct * mappingData, unsigned short 
 
 	if(buffer.length > MappingMaxLength)VT_HANDLE_FATAL_ERROR(0);
 
+	//buf[0]buf[1] is the data
 	buffer.buf[1] = sideLen & 0xFF;
 	buffer.buf[0] = (sideLen >> 8)	& 0xFF;
 
 	buffer.msgType = sideLengthMsg;
-	return(xQueueSend(mappingData->inQ, (void *) (&buffer), portMAX_DELAY));	
-
+	return(xQueueSend(mappingData->inQ, (void *) (&buffer), portMAX_DELAY));
 }
 

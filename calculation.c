@@ -8,6 +8,7 @@
 #include "task.h"
 #include "semphr.h"
 #include "vtUtilities.h"
+
 /* include files. */
 #include "calculation.h"
 #include "webserver.h"
@@ -37,14 +38,17 @@ static portTASK_FUNCTION_PROTO( CalcTask, pvParameters);
 
 void vStartCalcTask(CalcStruct * ptr, unsigned portBASE_TYPE uxPriority, MappingStruct * mapdata, WebStruct * webdata)
 {
+	//create the queue
 	if( (ptr->inQ = xQueueCreate(calcQLength, sizeof(CalcMsg))) == NULL){
 		VT_HANDLE_FATAL_ERROR(0);
 	}
-
 	portBASE_TYPE retval;
+
+	//Ptr has access to structs to the tasks that it communicates with
 	ptr->webData = webdata;
 	ptr->mapData = mapdata;
 
+	//create the task
 	if( (retval = xTaskCreate(CalcTask, (signed char *) "Calculation", conSTACK_SIZE, (void*)ptr, uxPriority, ( xTaskHandle * ) NULL )) != pdPASS){
 		VT_HANDLE_FATAL_ERROR(0);
 	}	
@@ -57,24 +61,27 @@ static portTASK_FUNCTION(CalcTask, pvParameters)
 
 	WebStruct * webData = calcPtr->webData;
 	MappingStruct * mapData = calcPtr->mapData;
+
+	//run the task
 	for(;;){
 		if (xQueueReceive(calcPtr->inQ,(void *) &msgBuffer,portMAX_DELAY) != pdTRUE) {
 			VT_HANDLE_FATAL_ERROR(0);
 		}
 
-
 		switch(msgBuffer.msgType){
-
+			
+			//right now only one message type
 			case sensorDataMsg:	 //From UART
 		 	{
-				//get the message:
-				unsigned short data = (256 * msgBuffer.buf[0]) + msgBuffer.buf[1];
+				//get the message.
+				//data = [ buf[0] buf[1] ]
+				unsigned short data = (short)(256 * msgBuffer.buf[0]) + msgBuffer.buf[1];
 				
 				//whatever needs to be done with the data...
+				//calculatedData = useDataToCalculateSomething(data);
 
 				//example: maybe send as side length to mapping task?
 				//sendSideLengthDataMsg(mapData, data);
-
 		 		break;
 			 }
 			 default:
@@ -86,14 +93,16 @@ static portTASK_FUNCTION(CalcTask, pvParameters)
 	}
 }
 
+
 portBASE_TYPE sendSensorDataMsg(CalcStruct * calcdata, unsigned short sensorData)
 {
 	if(calcdata == NULL) VT_HANDLE_FATAL_ERROR(0);
-   	
+   		
 	CalcMsg buffer;
 	buffer.length = 2;
 	if(buffer.length > maxCalcMsgLength)VT_HANDLE_FATAL_ERROR(0);
 
+	//buf = [top 8 bits][bottom 8 bits]
 	buffer.buf[1] = sensorData & 0xFF;
 	buffer.buf[0] = (sensorData >> 8) & 0xFF;
 	buffer.msgType = sensorDataMsg;
